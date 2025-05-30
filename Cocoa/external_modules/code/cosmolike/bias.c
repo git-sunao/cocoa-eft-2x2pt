@@ -191,4 +191,62 @@ double gbmag(const double z, const int ni)
   return ans;
 }
 
+double gcs2(const double z, const int ni)
+{
+  // EFT: This is the effective sound speed
+  // Eq (2.7) of https://arxiv.org/pdf/2004.10607
+  if (ni < -1 || ni > redshift.clustering_nbin - 1)
+  {
+    log_fatal("error in selecting bin number ni = %d", ni);
+    exit(1);
+  }
 
+  double ans;
+
+  switch(like.galaxy_bias_model[5])
+  {
+    case BCS2_PER_BIN:
+    {
+      ans = nuisance.gb[5][ni];
+      break;
+    }
+    default:
+    {
+      log_fatal("like.galaxy_bias_model[5] = %d not supported", 
+        like.galaxy_bias_model[5]);
+      exit(1);  
+    }
+  }
+
+  return ans;
+}
+
+double grs2(const double z, const int ni)
+{
+  // EFT: This is the higher-order derivative R_*^2
+  // Eq (2.7) of https://arxiv.org/pdf/2004.10607
+  if (ni < -1 || ni > redshift.clustering_nbin - 1)
+  {
+    log_fatal("error in selecting bin number ni = %d", ni);
+    exit(1);
+  }
+
+  double ans;
+
+  switch(like.galaxy_bias_model[6])
+  {
+    case BRS2_PER_BIN:
+    {
+      ans = nuisance.gb[6][ni];
+      break;
+    }
+    default:
+    {
+      log_fatal("like.galaxy_bias_model[6] = %d not supported", 
+        like.galaxy_bias_model[6]);
+      exit(1);  
+    }
+  }
+
+  return ans;
+}

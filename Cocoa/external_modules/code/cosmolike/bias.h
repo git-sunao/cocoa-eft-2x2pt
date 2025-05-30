@@ -21,6 +21,10 @@ extern "C" {
 
 #define BMAG_PER_BIN 0
 
+#define BCS2_PER_BIN 0
+
+#define BRS2_PER_BIN 0
+
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // galaxy bias evolution with redshift
@@ -36,6 +40,12 @@ double gbs2(const double z, const int ni);
 double gb3(const double z, const int ni);
 
 double gbmag(const double z, const int ni);
+
+// EFT: effective sound speed
+double gcs2(const double z, const int ni);
+
+// EFT: higher-order derivative
+double grs2(const double z, const int ni);
 
 #ifdef __cplusplus
 }

@@ -569,7 +569,9 @@ void set_non_linear_power_spectrum(
 void set_nuisance_bias(
     arma::Col<double> B1, 
     arma::Col<double> B2, 
-    arma::Col<double> B_MAG
+    arma::Col<double> B_MAG, 
+    arma::Col<double> CS2, 
+    arma::Col<double> RS2
   );
 
 void set_nuisance_clustering_photoz(

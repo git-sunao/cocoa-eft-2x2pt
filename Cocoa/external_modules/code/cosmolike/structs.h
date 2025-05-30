@@ -319,6 +319,8 @@ typedef struct
                                           // [2] = bs2, 
                                           // [3] = b3, 
                                           // [4] = bmag 
+                                          // [5] = cs2
+                                          // [6] = rs2 
   int halo_model[MAX_SIZE_ARRAYS]; // [0] = HMF, 
                                    // [1] = BIAS, 
                                    // [2] = CONCENTRATION

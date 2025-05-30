@@ -422,6 +422,8 @@ void init_bias(arma::Col<double> bias_z_evol_model)
                                           // [2] = bs2, 
                                           // [3] = b3, 
                                           // [4] = bmag 
+                                          // [5] = cs2
+                                          // [6] = rs2 
   */
   for(int i=0; i<bias_z_evol_model.n_elem; i++)
   {
@@ -2420,13 +2422,73 @@ void set_nuisance_magnification_bias(vector B_MAG)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void set_nuisance_bias(vector B1, vector B2, vector B_MAG)
+void set_nuisance_eft_ctr(vector CS2, vector RS2)
+{
+  spdlog::debug("{}: Begins", "set_nuisance_eft_ctr");
+
+  if (redshift.clustering_nbin == 0)
+  {
+    spdlog::critical("{}: {} = 0 is invalid",
+      "set_nuisance_eft_ctr", "clustering_Nbin");
+    exit(1);
+  }
+  if (redshift.clustering_nbin != static_cast<int>(CS2.n_elem))
+  {
+    spdlog::critical(
+      "{}: incompatible input w/ size = {} (!= {})",
+      "set_nuisance_eft_ctr", CS2.n_elem, redshift.clustering_nbin);
+    exit(1);
+  }
+  if (redshift.clustering_nbin != static_cast<int>(RS2.n_elem))
+  {
+    spdlog::critical(
+      "{}: incompatible input w/ size = {} (!= {})",
+      "set_nuisance_eft_ctr", RS2.n_elem, redshift.clustering_nbin);
+    exit(1);
+  }
+
+  // GALAXY BIAS ------------------------------------------
+  // 1st index: b[0][i] = linear galaxy bias in clustering bin i (b1)
+  //            b[1][i] = linear galaxy bias in clustering bin i (b2)
+  //            b[2][i] = leading order tidal bias in clustering bin i (b3)
+  //            b[3][i] = leading order tidal bias in clustering bin i
+  //            b[4][i]: amplitude of magnification bias in clustering bin i
+  //            b[5][i]: effective sound speed of EFT
+  //            b[6][i]: higher-order derivative of EFT
+  int cache_update = 0;
+  for (int i=0; i<redshift.clustering_nbin; i++)
+  {
+    if(fdiff(nuisance.gb[5][i], CS2(i)))
+    {
+      cache_update = 1;
+      nuisance.gb[5][i] = CS2(i);
+    }
+    if(fdiff(nuisance.gb[6][i], RS2(i)))
+    {
+      cache_update = 1;
+      nuisance.gb[6][i] = RS2(i);
+    } 
+  }
+
+  if(1 == cache_update)
+    nuisance.random_galaxy_bias = RandomNumber::get_instance().get();
+
+  spdlog::debug("{}: Ends", "set_nuisance_eft_ctr");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_nuisance_bias(vector B1, vector B2, vector B_MAG, vector CS2, vector RS2)
 {
   set_nuisance_linear_bias(B1);
   
   set_nuisance_nonlinear_bias(B1, B2);
   
   set_nuisance_magnification_bias(B_MAG);
+
+  set_nuisance_eft_ctr(CS2, RS2);
 }
 
 // ---------------------------------------------------------------------------

@@ -85,6 +85,16 @@ static int has_b2_galaxies()
   return res;
 }
 
+static int has_ctr_galaxies()
+{
+  // Check if galaxies have counter terms
+  int res = 0;
+  for (int i=0; i<redshift.clustering_nbin; i++) 
+    if (nuisance.gb[5][i] || nuisance.gb[6][i]) // cs2 and rs2
+      res = 1;
+    return res;
+}
+
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
@@ -1217,6 +1227,9 @@ double int_for_C_gs_tomo_limber(double a, void* params)
   }
   const double l = ar[2];
   const int nonlinear_bias = ar[3];
+  // Sunao's edit STARTS
+  const int add_ctr = ar[4];
+  // Sunao's edit ENDS
   
   const double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
@@ -1305,6 +1318,20 @@ double int_for_C_gs_tomo_limber(double a, void* params)
         oneloop = 0.5*g4*(b2 * d1d2 + bs2 * d1s2 + b3 * d1d3);
       }
 
+      // Sunao's edit STARTS
+      double counter_term = 0.0;
+      if (1 == add_ctr)
+      {
+        // In TATT case, we may need to think about the counter terms
+        // of g and IA together. For now, we use (2.12) of 
+        // https://arxiv.org/pdf/2004.10607
+        const double cs2 = gcs2(z, nl);
+        const double rs2 = grs2(z, nl);
+        counter_term += -(rs2 + 2.0*cs2*b1) * k*k* p_lin(k,a);
+        printf("Adding counter term: C_gs (TATT mode)\n");
+      }
+      // Sunao's edit ENDS
+      
       const double C1ZS  = IA_A1_Z1(a, growfac_a, ns);
       const double btazs = IA_BTA_Z1(a, growfac_a, ns);
       const double C2ZS  = IA_A2_Z1(a, growfac_a, ns);
@@ -1359,6 +1386,17 @@ double int_for_C_gs_tomo_limber(double a, void* params)
 
         oneloop = 0.5*g4*(b2*d1d2 + bs2*d1s2 + b3*d1d3);
       }
+      // Sunao's edit STARTS
+      double counter_term = 0.0;
+      if ( 1 == add_ctr)
+      {
+        // Eq (2.12) of https://arxiv.org/pdf/2004.10607
+        const double cs2 = gcs2(z, nl);
+        const double rs2 = grs2(z, nl);
+        counter_term += -(rs2 + 2.0*cs2*b1) * k*k* p_lin(k,a);
+        printf("Adding counter term: C_gs (NLA mode)\n");
+      }
+      // Sunao's edit ENDS
       
       const double C1ZS = IA_A1_Z1(a, growfac_a, ns);
 
@@ -1401,7 +1439,7 @@ double C_gs_tomo_limber_nointerp(
     cache[0] = Ntable.random;
   }
 
-  double ar[4] = {(double) nl, (double) ns, l, has_b2_galaxies()};
+  double ar[5] = {(double) nl, (double) ns, l, has_b2_galaxies(), has_ctr_galaxies()};
   
   const double amin = amin_lens(nl);
   const double amax = amax_lens(nl);
@@ -1521,7 +1559,12 @@ double int_for_C_gg_tomo_limber(double a, void* params)
   const double l  = ar[2];
   const int use_linear_ps = (int) ar[3];
   const int nonlinear_bias = ar[4];
-
+  // Sunao's edit STARTS
+  // TODO: Here I need to read the option of counter ter, 
+  // below is tentative. Make sure that the ar[5] can be 
+  // used for this flag.
+  const int add_ctr = ar[5];
+  // Sunao's edit ENDS
 
   struct chis chidchi = chi_all(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
@@ -1620,7 +1663,18 @@ double int_for_C_gg_tomo_limber(double a, void* params)
       b1i*bs2*d1s2 + 0.5*b2*bs2 * (d2s2 - 4. / 3.*s4) +
       0.25*bs2*bs2* (s2s2 - 8. / 9. * s4) + b1i*b3*d1d3);
   }
-  return (res +  oneloop)*chidchi.dchida/(fK*fK);
+  // Sunao's edit STARTS
+  double counter_term = 0.0;
+  if (1 == add_ctr)
+  {
+    // Eq (2.11g) of https://arxiv.org/pdf/2004.10607
+    const double cs2 = gcs2(z, ni);
+    const double rs2 = grs2(z, ni);
+    counter_term += -2.0*b1i*(rs2 + cs2*b1i) * k*k* p_lin(k,a);
+    printf("Adding counter term: C_gg\n");
+  }
+  // Sunao's edit ENDS
+  return (res +  oneloop + counter_term)*chidchi.dchida/(fK*fK);
 }
 
 double C_gg_tomo_limber_linpsopt_nointerp(
@@ -1656,7 +1710,7 @@ double C_gg_tomo_limber_linpsopt_nointerp(
     cache[0] = Ntable.random;
   }
 
-  double ar[5] = {ni, nj, l, use_linear_ps, has_b2_galaxies()};
+  double ar[6] = {ni, nj, l, use_linear_ps, has_b2_galaxies(), has_ctr_galaxies()};
   
   const double amin = amin_lens(ni);
   const double amax = amax_lens(ni);
@@ -1894,7 +1948,7 @@ double C_gk_tomo_limber_nointerp(const double l, const int ni, const int init)
     cache[0] = Ntable.random;
   }
 
-  double ar[3] = {(double) ni, l, has_b2_galaxies()};
+  double ar[4] = {(double) ni, l, has_b2_galaxies(), has_ctr_galaxies()};
   
   const double amin = amin_lens(ni);
   const double amax = amax_lens(ni);
