@@ -73,9 +73,9 @@ export IGNORE_COSMOPOWER_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export IGNORE_COSMOLIKE_LSSTY1_CODE=1
+export IGNORE_COSMOLIKE_LSSTY1_CODE=1
 export IGNORE_COSMOLIKE_DES_Y3_CODE=1
-#export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
 # ------------------------------------------------------------------------------
@@ -348,9 +348,13 @@ export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
 export ROMAN_FOURIER_COMMIT="282e1d222a1827e02d7c04faa94939a4520640ac"
 
-export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
+# export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
+# export ROMAN_REAL_NAME="roman_real"
+# export ROMAN_REAL_COMMIT="a5cf62ffcec7b862dda5bf343bf6bb19124bb5d0"
+
+export ROMAN_REAL_URL="https://github.com/git-sunao/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
-export ROMAN_REAL_COMMIT="a5cf62ffcec7b862dda5bf343bf6bb19124bb5d0"
+export ROMAN_REAL_BRANCH="eft"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
