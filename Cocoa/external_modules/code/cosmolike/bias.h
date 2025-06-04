@@ -49,7 +49,7 @@ double gcs2(const double z, const int ni);
 // EFT: higher-order derivative
 double grs2(const double z, const int ni);
 
-// EFT: Gaussian dumping scal
+// EFT: Gaussian damping scal
 double grd(const double z, const int ni);
 
 #ifdef __cplusplus

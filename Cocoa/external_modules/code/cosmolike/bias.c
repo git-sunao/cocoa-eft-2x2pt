@@ -254,7 +254,7 @@ double grs2(const double z, const int ni)
 double grd(const double z, const int ni)
 {
   // EFT: Scale to regularize the EFT ctr + hd terms
-  // Gaussian dumping will be applied: exp(-k^2*rd^2)
+  // Gaussian damping will be applied: exp(-k^2*rd^2)
   if (ni < -1 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);

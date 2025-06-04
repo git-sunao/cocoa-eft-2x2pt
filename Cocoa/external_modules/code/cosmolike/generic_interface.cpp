@@ -2463,7 +2463,7 @@ void set_nuisance_eft_ctr(vector CS2, vector RS2, vector RD)
   //            b[4][i]: amplitude of magnification bias in clustering bin i
   //            b[5][i]: effective sound speed of EFT
   //            b[6][i]: higher-order derivative of EFT
-  //            b[7][i]: Gaussian dumping scale
+  //            b[7][i]: Gaussian damping scale
   int cache_update = 0;
   for (int i=0; i<redshift.clustering_nbin; i++)
   {
