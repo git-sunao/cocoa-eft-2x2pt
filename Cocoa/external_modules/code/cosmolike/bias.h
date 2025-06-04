@@ -25,6 +25,8 @@ extern "C" {
 
 #define BRS2_PER_BIN 0
 
+#define BRD_PER_BIN 0
+
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // galaxy bias evolution with redshift
@@ -46,6 +48,9 @@ double gcs2(const double z, const int ni);
 
 // EFT: higher-order derivative
 double grs2(const double z, const int ni);
+
+// EFT: Gaussian dumping scal
+double grd(const double z, const int ni);
 
 #ifdef __cplusplus
 }

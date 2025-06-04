@@ -250,3 +250,33 @@ double grs2(const double z, const int ni)
 
   return ans;
 }
+
+double grd(const double z, const int ni)
+{
+  // EFT: Scale to regularize the EFT ctr + hd terms
+  // Gaussian dumping will be applied: exp(-k^2*rd^2)
+  if (ni < -1 || ni > redshift.clustering_nbin - 1)
+  {
+    log_fatal("error in selecting bin number ni = %d", ni);
+    exit(1);
+  }
+
+  double ans;
+
+  switch(like.galaxy_bias_model[7])
+  {
+    case BRD_PER_BIN:
+    {
+      ans = nuisance.gb[7][ni];
+      break;
+    }
+    default:
+    {
+      log_fatal("like.galaxy_bias_model[7] = %d not supported", 
+        like.galaxy_bias_model[7]);
+      exit(1);  
+    }
+  }
+
+  return ans;
+}

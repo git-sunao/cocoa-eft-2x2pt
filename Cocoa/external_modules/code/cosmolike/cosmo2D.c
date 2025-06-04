@@ -1328,7 +1328,12 @@ double int_for_C_gs_tomo_limber(double a, void* params)
         const double cs2 = gcs2(z, nl);
         const double rs2 = grs2(z, nl);
         counter_term += -(rs2 + 2.0*cs2*b1) * k*k* p_lin(k,a);
-        printf("Adding counter term: C_gs (TATT mode)\n");
+        // printf("Adding counter term: C_gs (TATT mode)\n");
+        const double rd  = grd(z, nl);
+        if (rd > 0)
+        {
+          counter_term *= exp(-k*k*rd*rd);
+        }
       }
       // Sunao's edit ENDS
       
@@ -1337,7 +1342,8 @@ double int_for_C_gs_tomo_limber(double a, void* params)
       const double C2ZS  = IA_A2_Z1(a, growfac_a, ns);
 
       // TODO: IS THIS CONSISTENT (WRSD, ONELOOP AND IA CROSS TERMS)?
-      ans =  WK*((WGAL*b1+WMAG*ell_prefactor*bmag+WRSD)*PK+WGAL*oneloop) 
+      // Sunao TODO: Check if the counter term has appropriate prefactor
+      ans =  WK*((WGAL*b1+WMAG*ell_prefactor*bmag+WRSD)*PK+WGAL*oneloop+WGAL*counter_term)
             -WS*(WGAL*b1+WMAG*ell_prefactor*bmag)*( C1ZS*PK
                                                     + C1ZS*btazs*(ta_dE1+ta_dE2) 
                                                     - 5*C2ZS*(mixA+mixB));
@@ -1394,13 +1400,18 @@ double int_for_C_gs_tomo_limber(double a, void* params)
         const double cs2 = gcs2(z, nl);
         const double rs2 = grs2(z, nl);
         counter_term += -(rs2 + 2.0*cs2*b1) * k*k* p_lin(k,a);
-        printf("Adding counter term: C_gs (NLA mode)\n");
+        // printf("Adding counter term: C_gs (NLA mode)\n");
+        const double rd  = grd(z, nl);
+        if (rd > 0)
+        {
+          counter_term *= exp(-k*k*rd*rd);
+        }
       }
       // Sunao's edit ENDS
       
       const double C1ZS = IA_A1_Z1(a, growfac_a, ns);
 
-      ans = (WK-WS*C1ZS)*((WGAL*b1+WMAG*ell_prefactor*bmag+WRSD)*PK+WGAL*oneloop);
+      ans = (WK-WS*C1ZS)*((WGAL*b1+WMAG*ell_prefactor*bmag+WRSD)*PK+WGAL*oneloop+WGAL*counter_term);
       break;
     }
     default:
@@ -1671,7 +1682,12 @@ double int_for_C_gg_tomo_limber(double a, void* params)
     const double cs2 = gcs2(z, ni);
     const double rs2 = grs2(z, ni);
     counter_term += -2.0*b1i*(rs2 + cs2*b1i) * k*k* p_lin(k,a);
-    printf("Adding counter term: C_gg\n");
+    // printf("Adding counter term: C_gg\n");
+    const double rd  = grd(z, ni);
+    if (rd > 0)
+    {
+      counter_term *= exp(-k*k*rd*rd);
+    }
   }
   // Sunao's edit ENDS
   return (res +  oneloop + counter_term)*chidchi.dchida/(fK*fK);

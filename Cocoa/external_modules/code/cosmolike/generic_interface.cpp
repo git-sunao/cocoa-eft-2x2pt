@@ -424,6 +424,7 @@ void init_bias(arma::Col<double> bias_z_evol_model)
                                           // [4] = bmag 
                                           // [5] = cs2
                                           // [6] = rs2 
+                                          // [7] = rd
   */
   for(int i=0; i<bias_z_evol_model.n_elem; i++)
   {
@@ -2422,7 +2423,7 @@ void set_nuisance_magnification_bias(vector B_MAG)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void set_nuisance_eft_ctr(vector CS2, vector RS2)
+void set_nuisance_eft_ctr(vector CS2, vector RS2, vector RD)
 {
   spdlog::debug("{}: Begins", "set_nuisance_eft_ctr");
 
@@ -2446,6 +2447,13 @@ void set_nuisance_eft_ctr(vector CS2, vector RS2)
       "set_nuisance_eft_ctr", RS2.n_elem, redshift.clustering_nbin);
     exit(1);
   }
+  if (redshift.clustering_nbin != static_cast<int>(RD.n_elem))
+  {
+    spdlog::critical(
+      "{}: incompatible input w/ size = {} (!= {})",
+      "set_nuisance_eft_ctr", RD.n_elem, redshift.clustering_nbin);
+    exit(1);
+  }
 
   // GALAXY BIAS ------------------------------------------
   // 1st index: b[0][i] = linear galaxy bias in clustering bin i (b1)
@@ -2455,6 +2463,7 @@ void set_nuisance_eft_ctr(vector CS2, vector RS2)
   //            b[4][i]: amplitude of magnification bias in clustering bin i
   //            b[5][i]: effective sound speed of EFT
   //            b[6][i]: higher-order derivative of EFT
+  //            b[7][i]: Gaussian dumping scale
   int cache_update = 0;
   for (int i=0; i<redshift.clustering_nbin; i++)
   {
@@ -2468,6 +2477,11 @@ void set_nuisance_eft_ctr(vector CS2, vector RS2)
       cache_update = 1;
       nuisance.gb[6][i] = RS2(i);
     } 
+    if(fdiff(nuisance.gb[7][i], RD(i)))
+    {
+      cache_update = 1;
+      nuisance.gb[7][i] = RD(i);
+    } 
   }
 
   if(1 == cache_update)
@@ -2480,7 +2494,7 @@ void set_nuisance_eft_ctr(vector CS2, vector RS2)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void set_nuisance_bias(vector B1, vector B2, vector B_MAG, vector CS2, vector RS2)
+void set_nuisance_bias(vector B1, vector B2, vector B_MAG, vector CS2, vector RS2, vector RD)
 {
   set_nuisance_linear_bias(B1);
   
@@ -2488,7 +2502,7 @@ void set_nuisance_bias(vector B1, vector B2, vector B_MAG, vector CS2, vector RS
   
   set_nuisance_magnification_bias(B_MAG);
 
-  set_nuisance_eft_ctr(CS2, RS2);
+  set_nuisance_eft_ctr(CS2, RS2, RD);
 }
 
 // ---------------------------------------------------------------------------
