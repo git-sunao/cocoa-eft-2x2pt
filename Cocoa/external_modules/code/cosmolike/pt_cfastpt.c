@@ -18,8 +18,8 @@ void get_FPT_bias(void)
 
   if (fdiff(cache[1], Ntable.random))
   {
-    FPTIA.k_min     = 1.e-5;
-    FPTIA.k_max     = 1.e+5;
+    FPTbias.k_min   = 1.e-5;
+    FPTbias.k_max   = 1.e+5;
     FPTbias.N       = 800 + 200 * Ntable.FPTboost;
     if (FPTbias.tab != NULL) {
       free(FPTbias.tab);
