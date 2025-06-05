@@ -76,11 +76,11 @@ double w_pixel(const double ell)
   return (lbins > 0) ? ((l < lbins) ? cl_pixel[l] : 0.0) : 1.0;
 }
 
-static int has_b2_galaxies()
+static int has_b2s23_galaxies()
 {
   int res = 0;
   for (int i=0; i<redshift.clustering_nbin; i++) 
-    if (nuisance.gb[1][i])
+    if (nuisance.gb[1][i] || nuisance.gb[2][i] || nuisance.gb[3][i])
       res = 1;
   return res;
 }
@@ -1327,12 +1327,13 @@ double int_for_C_gs_tomo_limber(double a, void* params)
         // https://arxiv.org/pdf/2004.10607
         const double cs2 = gcs2(z, nl);
         const double rs2 = grs2(z, nl);
-        counter_term += -(rs2 + 2.0*cs2*b1) * k*k* p_lin(k,a);
+        const double k_phy = k/cosmology.coverH0;
+        counter_term += -(rs2 + 2.0*cs2*b1) * k_phy*k_phy* p_lin(k,a);
         // printf("Adding counter term: C_gs (TATT mode)\n");
         const double rd  = grd(z, nl);
         if (rd > 0)
         {
-          counter_term *= exp(-k*k*rd*rd);
+          counter_term *= exp(-k_phy*k_phy*rd*rd);
         }
       }
       // Sunao's edit ENDS
@@ -1399,12 +1400,13 @@ double int_for_C_gs_tomo_limber(double a, void* params)
         // Eq (2.12) of https://arxiv.org/pdf/2004.10607
         const double cs2 = gcs2(z, nl);
         const double rs2 = grs2(z, nl);
-        counter_term += -(rs2 + 2.0*cs2*b1) * k*k* p_lin(k,a);
+        const double k_phy = k/cosmology.coverH0;
+        counter_term += -(rs2 + 2.0*cs2*b1) * k_phy*k_phy* p_lin(k,a);
         // printf("Adding counter term: C_gs (NLA mode)\n");
         const double rd  = grd(z, nl);
         if (rd > 0)
         {
-          counter_term *= exp(-k*k*rd*rd);
+          counter_term *= exp(-k_phy*k_phy*rd*rd);
         }
       }
       // Sunao's edit ENDS
@@ -1450,7 +1452,7 @@ double C_gs_tomo_limber_nointerp(
     cache[0] = Ntable.random;
   }
 
-  double ar[5] = {(double) nl, (double) ns, l, has_b2_galaxies(), has_ctr_galaxies()};
+  double ar[5] = {(double) nl, (double) ns, l, has_b2s23_galaxies(), has_ctr_galaxies()};
   
   const double amin = amin_lens(nl);
   const double amax = amax_lens(nl);
@@ -1681,12 +1683,13 @@ double int_for_C_gg_tomo_limber(double a, void* params)
     // Eq (2.11g) of https://arxiv.org/pdf/2004.10607
     const double cs2 = gcs2(z, ni);
     const double rs2 = grs2(z, ni);
-    counter_term += -2.0*b1i*(rs2 + cs2*b1i) * k*k* p_lin(k,a);
+    const double k_phy = k/cosmology.coverH0;
+    counter_term += -2.0*b1i*(rs2 + cs2*b1i) * k_phy*k_phy* p_lin(k,a);
     // printf("Adding counter term: C_gg\n");
     const double rd  = grd(z, ni);
     if (rd > 0)
     {
-      counter_term *= exp(-k*k*rd*rd);
+      counter_term *= exp(-k_phy*k_phy*rd*rd);
     }
   }
   // Sunao's edit ENDS
@@ -1726,7 +1729,7 @@ double C_gg_tomo_limber_linpsopt_nointerp(
     cache[0] = Ntable.random;
   }
 
-  double ar[6] = {ni, nj, l, use_linear_ps, has_b2_galaxies(), has_ctr_galaxies()};
+  double ar[6] = {ni, nj, l, use_linear_ps, has_b2s23_galaxies(), has_ctr_galaxies()};
   
   const double amin = amin_lens(ni);
   const double amax = amax_lens(ni);
@@ -1964,7 +1967,7 @@ double C_gk_tomo_limber_nointerp(const double l, const int ni, const int init)
     cache[0] = Ntable.random;
   }
 
-  double ar[4] = {(double) ni, l, has_b2_galaxies(), has_ctr_galaxies()};
+  double ar[4] = {(double) ni, l, has_b2s23_galaxies(), has_ctr_galaxies()};
   
   const double amin = amin_lens(ni);
   const double amax = amax_lens(ni);

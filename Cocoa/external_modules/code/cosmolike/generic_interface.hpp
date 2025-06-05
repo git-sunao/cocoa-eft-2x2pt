@@ -569,6 +569,8 @@ void set_non_linear_power_spectrum(
 void set_nuisance_bias(
     arma::Col<double> B1, 
     arma::Col<double> B2, 
+    arma::Col<double> BS2, 
+    arma::Col<double> B3, 
     arma::Col<double> B_MAG, 
     arma::Col<double> CS2, 
     arma::Col<double> RS2,
@@ -595,7 +597,9 @@ void set_nuisance_magnification_bias(
 
 void set_nuisance_nonlinear_bias(
     arma::Col<double> B1,
-    arma::Col<double> B2
+    arma::Col<double> B2,
+    arma::Col<double> BS2,
+    arma::Col<double> B3
   );
 
 void set_nuisance_shear_calib(

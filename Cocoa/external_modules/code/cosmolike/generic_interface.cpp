@@ -2333,7 +2333,7 @@ void set_nuisance_linear_bias(vector B1)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void set_nuisance_nonlinear_bias(vector B1, vector B2)
+void set_nuisance_nonlinear_bias(vector B1, vector B2, vector BS2, vector B3)
 {
   spdlog::debug("{}: Begins", "set_nuisance_nonlinear_bias");
 
@@ -2358,7 +2358,10 @@ void set_nuisance_nonlinear_bias(vector B1, vector B2)
   //            b[1][i]: nonlinear b2 galaxy bias in clustering bin i
   //            b[2][i]: leading order tidal bs2 galaxy bias in clustering bin i
   //            b[3][i]: nonlinear b3 galaxy bias  in clustering bin i 
-  //            b[4][i]: amplitude of magnification bias in clustering bin i 
+  // Note that the value assigned here does not necessarily used.
+  // Later, depending on the choice of the galaxy bias modeling
+  // these parameter could be recomputed by the b1 value using the 
+  // co-evolution relation or growth relation etc, in bias.c.
   int cache_update = 0;
   for (int i=0; i<redshift.clustering_nbin; i++)
   {
@@ -2366,7 +2369,16 @@ void set_nuisance_nonlinear_bias(vector B1, vector B2)
     {
       cache_update = 1;
       nuisance.gb[1][i] = B2(i);
-      nuisance.gb[2][i] = almost_equal(B2(i), 0.) ? 0 : (-4./7.)*(B1(i)-1.0);
+    }
+    if(fdiff(nuisance.gb[2][i], BS2(i)))
+    {
+      cache_update = 1;
+      nuisance.gb[2][i] = BS2(i);
+    }
+    if(fdiff(nuisance.gb[3][i], B3(i)))
+    {
+      cache_update = 1;
+      nuisance.gb[3][i] = B3(i);
     }
   }
   if(1 == cache_update)
@@ -2494,11 +2506,11 @@ void set_nuisance_eft_ctr(vector CS2, vector RS2, vector RD)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void set_nuisance_bias(vector B1, vector B2, vector B_MAG, vector CS2, vector RS2, vector RD)
+void set_nuisance_bias(vector B1, vector B2, vector BS2, vector B3, vector B_MAG, vector CS2, vector RS2, vector RD)
 {
   set_nuisance_linear_bias(B1);
   
-  set_nuisance_nonlinear_bias(B1, B2);
+  set_nuisance_nonlinear_bias(B1, B2, BS2, B3);
   
   set_nuisance_magnification_bias(B_MAG);
 
